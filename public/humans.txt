@@ -1,6 +1,6 @@
 /* TEAM */
   Site: Μεγάλη Μελανθίου
-  Place: Αθήνα, 105 54
+  Place: Melanthiou 8, Athens, Greece
 
 /* SITE */
   Standards: HTML5, CSS3
