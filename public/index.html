@@ -48,6 +48,7 @@
     <link rel="preload" href="/fonts/ABCSchengenZoneGreekUnlicensedTrial-Light.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/fonts/Avenir-Roman.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/vendor/plyr/plyr.css">
 
     <script type="application/ld+json">
       {
@@ -120,13 +121,10 @@
       <h1>ΜΕΓΑΛΗ ΜΕΛΑΝΘΙΟΥ</h1>
 
       <div class="video">
-        <iframe
-          src="https://www.youtube.com/embed/lFyqi_EfLNk"
-          title="Η Κληρονομιά της Κουκουβάγιας — Συμπόσιο"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        ></iframe>
+        <div class="video-frame">
+          <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="lFyqi_EfLNk"></div>
+          <div class="video-cover" aria-hidden="true"></div>
+        </div>
       </div>
 
       <div class="subtitle-container">
@@ -134,5 +132,7 @@
         <p class="subtitle">105 54</p>
       </div>
     </main>
+    <script src="/vendor/plyr/plyr.min.js"></script>
+    <script src="/js/player.js"></script>
   </body>
 </html>
