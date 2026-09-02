@@ -1,0 +1,8 @@
+# Replace https://melanthiou.netlify.app with your production domain.
+
+User-agent: *
+Allow: /
+
+Disallow: /404.html
+
+Sitemap: https://melanthiou.netlify.app/sitemap.xml

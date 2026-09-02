@@ -1,0 +1,24 @@
+{
+  "name": "Μεγάλη Μελανθίου",
+  "short_name": "Μελανθίου",
+  "description": "Μεγάλη Μελανθίου — μπαρ στην Αθήνα, 105 54.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b0a09",
+  "theme_color": "#0b0a09",
+  "lang": "el",
+  "icons": [
+    {
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
