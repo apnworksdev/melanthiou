@@ -8,6 +8,7 @@
   var LOGO_DELAY = 1200;
   var SUBTITLE_DELAY = 2400;
   var REVEAL_DELAY = 4000;
+  var LOADING_DELAY = 4500;
   var textsRevealed = false;
   var playbackStarted = false;
 
@@ -198,7 +199,7 @@
       playButton.disabled = true;
       wrap.classList.add("is-loading");
       playNow();
-      scheduleVideoReveal(REVEAL_DELAY);
+      scheduleVideoReveal(LOADING_DELAY);
     });
   }
 })();
