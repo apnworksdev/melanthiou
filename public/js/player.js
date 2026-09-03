@@ -2,13 +2,14 @@
   var wrap = document.querySelector(".video");
   var target = document.querySelector("#player");
   var playButton = document.querySelector(".video-play");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var TITLE_DELAY = 600;
   var LOGO_DELAY = 1200;
   var SUBTITLE_DELAY = 2400;
   var REVEAL_DELAY = 4000;
-  var AUTOPLAY_WAIT = 1500;
   var textsRevealed = false;
+  var playbackStarted = false;
 
   var scheduleTextReveal = function () {
     if (textsRevealed) return;
@@ -30,13 +31,21 @@
     }, SUBTITLE_DELAY);
   };
 
+  var showPlayButton = function () {
+    if (playbackStarted || !wrap) return;
+    wrap.classList.add("is-waiting");
+  };
+
+  var hidePlayButton = function () {
+    if (!wrap) return;
+    wrap.classList.remove("is-waiting");
+  };
+
   scheduleTextReveal();
 
-  if (!wrap || !target || typeof Plyr === "undefined") return;
+  setTimeout(showPlayButton, reduceMotion ? 0 : REVEAL_DELAY);
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    return;
-  }
+  if (!wrap || !target || typeof Plyr === "undefined") return;
 
   var TZ = "Europe/Athens";
   var started = false;
@@ -45,7 +54,7 @@
   var manual = false;
 
   var player = new Plyr(target, {
-    autoplay: true,
+    autoplay: !reduceMotion,
     muted: true,
     loop: { active: true },
     controls: [],
@@ -128,7 +137,13 @@
     }
   };
 
-  var playSafe = function () {
+  var playNow = function () {
+    player.muted = true;
+    disableCaptions();
+    var embed = player.embed;
+    if (embed && typeof embed.playVideo === "function") {
+      embed.playVideo();
+    }
     var play = player.play();
     if (play && typeof play.catch === "function") {
       play.catch(function () {
@@ -137,25 +152,16 @@
     }
   };
 
-  var showPlayButton = function () {
-    if (revealed || player.playing) return;
-    wrap.classList.add("is-waiting");
-  };
-
-  var hidePlayButton = function () {
-    wrap.classList.remove("is-waiting");
-  };
-
   var joinExhibition = function () {
-    if (started) return;
+    if (started) {
+      seekToExhibition();
+      return;
+    }
     if (!seekToExhibition()) {
       setTimeout(joinExhibition, 80);
       return;
     }
     started = true;
-    player.muted = true;
-    disableCaptions();
-    playSafe();
   };
 
   var scheduleVideoReveal = function (delay) {
@@ -169,28 +175,21 @@
   player.on("ready", function () {
     player.muted = true;
     disableCaptions();
-    joinExhibition();
-    setTimeout(function () {
-      if (!player.playing) showPlayButton();
-    }, AUTOPLAY_WAIT);
+    if (!reduceMotion && !manual) playNow();
   });
 
   player.on("playing", function () {
+    playbackStarted = true;
     disableCaptions();
     hidePlayButton();
-    if (!started) joinExhibition();
-    scheduleVideoReveal(manual ? 400 : REVEAL_DELAY);
+    joinExhibition();
+    scheduleVideoReveal(manual || reduceMotion ? 400 : REVEAL_DELAY);
   });
 
   if (playButton) {
     playButton.addEventListener("click", function () {
       manual = true;
-      hidePlayButton();
-      player.muted = true;
-      disableCaptions();
-      playSafe();
-      if (!started) joinExhibition();
-      else seekToExhibition();
+      playNow();
     });
   }
 })();
