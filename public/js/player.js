@@ -1,6 +1,37 @@
 (function () {
   var wrap = document.querySelector(".video");
   var target = document.querySelector("#player");
+  var playButton = document.querySelector(".video-play");
+
+  var TITLE_DELAY = 600;
+  var LOGO_DELAY = 1200;
+  var SUBTITLE_DELAY = 2400;
+  var REVEAL_DELAY = 4000;
+  var AUTOPLAY_WAIT = 1500;
+  var textsRevealed = false;
+
+  var scheduleTextReveal = function () {
+    if (textsRevealed) return;
+    textsRevealed = true;
+    var title = document.querySelector(".landing h1");
+    var logo = document.querySelector(".logo");
+    var subtitles = document.querySelector(".subtitle-container");
+
+    setTimeout(function () {
+      if (title) title.classList.add("is-ready");
+    }, TITLE_DELAY);
+
+    setTimeout(function () {
+      if (logo) logo.classList.add("is-ready");
+    }, LOGO_DELAY);
+
+    setTimeout(function () {
+      if (subtitles) subtitles.classList.add("is-ready");
+    }, SUBTITLE_DELAY);
+  };
+
+  scheduleTextReveal();
+
   if (!wrap || !target || typeof Plyr === "undefined") return;
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -8,13 +39,10 @@
   }
 
   var TZ = "Europe/Athens";
-  var TITLE_DELAY = 600;
-  var LOGO_DELAY = 1200;
-  var SUBTITLE_DELAY = 2400;
-  var REVEAL_DELAY = 4000;
   var started = false;
   var revealed = false;
   var revealTimer;
+  var manual = false;
 
   var player = new Plyr(target, {
     autoplay: true,
@@ -102,7 +130,20 @@
 
   var playSafe = function () {
     var play = player.play();
-    if (play && typeof play.catch === "function") play.catch(function () {});
+    if (play && typeof play.catch === "function") {
+      play.catch(function () {
+        showPlayButton();
+      });
+    }
+  };
+
+  var showPlayButton = function () {
+    if (revealed || player.playing) return;
+    wrap.classList.add("is-waiting");
+  };
+
+  var hidePlayButton = function () {
+    wrap.classList.remove("is-waiting");
   };
 
   var joinExhibition = function () {
@@ -117,39 +158,39 @@
     playSafe();
   };
 
-  var scheduleReveal = function () {
+  var scheduleVideoReveal = function (delay) {
     if (revealed || revealTimer) return;
-    var title = document.querySelector(".landing h1");
-    var logo = document.querySelector(".logo");
-    var subtitles = document.querySelector(".subtitle-container");
-
-    setTimeout(function () {
-      if (title) title.classList.add("is-ready");
-    }, TITLE_DELAY);
-
-    setTimeout(function () {
-      if (logo) logo.classList.add("is-ready");
-    }, LOGO_DELAY);
-
-    setTimeout(function () {
-      if (subtitles) subtitles.classList.add("is-ready");
-    }, SUBTITLE_DELAY);
-
     revealTimer = setTimeout(function () {
       revealed = true;
       wrap.classList.add("is-ready");
-    }, REVEAL_DELAY);
+    }, delay);
   };
 
   player.on("ready", function () {
     player.muted = true;
     disableCaptions();
     joinExhibition();
+    setTimeout(function () {
+      if (!player.playing) showPlayButton();
+    }, AUTOPLAY_WAIT);
   });
 
   player.on("playing", function () {
     disableCaptions();
+    hidePlayButton();
     if (!started) joinExhibition();
-    scheduleReveal();
+    scheduleVideoReveal(manual ? 400 : REVEAL_DELAY);
   });
+
+  if (playButton) {
+    playButton.addEventListener("click", function () {
+      manual = true;
+      hidePlayButton();
+      player.muted = true;
+      disableCaptions();
+      playSafe();
+      if (!started) joinExhibition();
+      else seekToExhibition();
+    });
+  }
 })();
