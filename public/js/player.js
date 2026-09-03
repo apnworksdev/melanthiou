@@ -166,6 +166,8 @@
     if (revealed || revealTimer) return;
     revealTimer = setTimeout(function () {
       revealed = true;
+      hidePlayButton();
+      wrap.classList.remove("is-loading");
       wrap.classList.add("is-ready");
     }, delay);
   };
@@ -181,14 +183,22 @@
     playbackStarted = true;
     started = true;
     disableCaptions();
-    hidePlayButton();
-    scheduleVideoReveal(manual || reduceMotion ? 400 : REVEAL_DELAY);
+    if (!manual) {
+      hidePlayButton();
+      scheduleVideoReveal(REVEAL_DELAY);
+    }
   });
 
   if (playButton) {
     playButton.addEventListener("click", function () {
+      if (manual) return;
       manual = true;
+      playButton.textContent = "Loading";
+      playButton.setAttribute("aria-label", "Loading");
+      playButton.disabled = true;
+      wrap.classList.add("is-loading");
       playNow();
+      scheduleVideoReveal(REVEAL_DELAY);
     });
   }
 })();

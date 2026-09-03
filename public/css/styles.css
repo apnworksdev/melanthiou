@@ -185,6 +185,11 @@ svg {
   pointer-events: auto;
 }
 
+.video.is-loading .video-play {
+  pointer-events: none;
+  cursor: default;
+}
+
 .video-play:focus {
   outline: none;
 }
