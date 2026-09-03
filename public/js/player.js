@@ -153,15 +153,13 @@
   };
 
   var joinExhibition = function () {
-    if (started) {
-      seekToExhibition();
-      return;
-    }
+    if (started || manual) return;
     if (!seekToExhibition()) {
       setTimeout(joinExhibition, 80);
       return;
     }
     started = true;
+    if (!playbackStarted) playNow();
   };
 
   var scheduleVideoReveal = function (delay) {
@@ -175,14 +173,15 @@
   player.on("ready", function () {
     player.muted = true;
     disableCaptions();
-    if (!reduceMotion && !manual) playNow();
+    if (!reduceMotion && !manual) joinExhibition();
   });
 
   player.on("playing", function () {
+    if (playbackStarted) return;
     playbackStarted = true;
+    started = true;
     disableCaptions();
     hidePlayButton();
-    joinExhibition();
     scheduleVideoReveal(manual || reduceMotion ? 400 : REVEAL_DELAY);
   });
 
